@@ -12,6 +12,7 @@ class MainClass {
     public static CyclicBarrier cyclicBarrier = new CyclicBarrier(CARS_COUNT); //не совсем уверен, что правильно его сюда ставить
     public static CountDownLatch finish = new CountDownLatch(CARS_COUNT);
     public static CountDownLatch prepare = new CountDownLatch(CARS_COUNT);
+    public static String winner;
 
     public static void main(String[] args) {
         Race race = new Race(new Road(60), new Tunnel(), new Road(40));
@@ -85,8 +86,17 @@ class Car implements Runnable {
         for (int i = 0; i < race.getStages().size(); i++) {
             race.getStages().get(i).go(this);
         }
+        finished(this.name);
+    }
+
+    private synchronized void finished(String threadName) {
+        if (MainClass.winner == null) {
+            MainClass.winner = threadName;
+            System.out.println(threadName + ": WIN");
+        }
         MainClass.finish.countDown();
     }
+
 }
 
 abstract class Stage {
